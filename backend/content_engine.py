@@ -45,8 +45,20 @@ def parse_notebook(filepath):
                 starter_code = parts[0].strip()
                 assertions = parts[1].strip() if len(parts) > 1 else ""
             else:
-                starter_code = source_text.strip()
-                assertions = ""
+                # Universal smart-splitting fallback: split at the first 'assert' statement!
+                lines = source_text.splitlines()
+                first_assert_index = -1
+                for idx, line in enumerate(lines):
+                    if line.strip().startswith("assert") or "assert " in line:
+                        first_assert_index = idx
+                        break
+                
+                if first_assert_index != -1:
+                    starter_code = "\n".join(lines[:first_assert_index]).strip()
+                    assertions = "\n".join(lines[first_assert_index:]).strip()
+                else:
+                    starter_code = source_text.strip()
+                    assertions = ""
 
             result["exercises"].append({
                 "starter_code": starter_code,

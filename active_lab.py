@@ -1,9 +1,5 @@
-# TODO: Correct the loop using the Rosetta Stone equation to accumulate state sequentially.
 total = 0
-
-# Your loop code here:
 for i in range(1, 6):
+    total = i # Attempt to accumulate by assigning directly
 
-
-assert total == 15, f"Expected 15, got {total}"
-print("Success! Accumulator pattern mastered.")
+print(f"Result: {total}") # Expected 15, but got 5! The state history is wiped out.
