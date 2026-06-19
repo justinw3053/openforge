@@ -456,7 +456,7 @@ class ChatViewModel: ObservableObject {
         // 2. Load the Socratic Memory asynchronously
         let memoryLedger = await loadMemoryLedger()
         
-        // 3. Build Socratic prompt with truncated context
+        // 3. Build Socratic prompt structures (System-Attention Isolated)
         let systemPrompt = """
         You are Carl, a brilliant, helpful Socratic tutor guiding an adult developer through the Syndicate 3.0 curriculum.
         Your primary directive: NEVER give out direct solution code!
@@ -465,24 +465,6 @@ class ChatViewModel: ObservableObject {
         
         If you discover a new milestone or recurring conceptual struggle, you have the special ability to write a structured update to the student's profile.
         To do so, output exactly: <memory_update>Add/Update details here</memory_update> at the very end of your response.
-        """
-        
-        let compiledPrompt = """
-        System: \(systemPrompt)
-        
-        Socratic Student Profile Memory:
-        \(memoryLedger)
-        
-        Offline Documentation Vault (RAG Matches):
-        \(formattedRAG)
-        
-        Curriculum Context (Active Workbook): \(lessonId)
-        Student's Active Code:
-        ```python
-        \(context)
-        ```
-        
-        User Query: \(text)
         """
         
         guard let url = URL(string: "http://127.0.0.1:11434/api/chat") else {
@@ -505,7 +487,40 @@ class ChatViewModel: ObservableObject {
             let stream: Bool
         }
         
-        let messagesArray = [MessagePayload(role: "user", content: compiledPrompt)]
+        // CRITICAL FIX: Pack prompt into distinct role messages rather than single flat user text
+        var messagesArray: [MessagePayload] = []
+        
+        // 1. SYSTEM ROLE MESSAGE: Hard guidelines, memory profile, and local RAG context
+        let systemContent = """
+        \(systemPrompt)
+        
+        Socratic Student Profile Memory:
+        \(memoryLedger)
+        
+        Offline Documentation Vault (RAG Matches):
+        \(formattedRAG)
+        """
+        messagesArray.append(MessagePayload(role: "system", content: systemContent))
+        
+        // 2. CHAT HISTORY: Append last 6 messages of context continuity
+        let historyQueue = messages.suffix(7).dropLast() // Exclude the newly added user query
+        for msg in historyQueue {
+            if msg.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { continue }
+            messagesArray.append(MessagePayload(role: msg.isUser ? "user" : "assistant", content: msg.text))
+        }
+        
+        // 3. USER ROLE MESSAGE: Workbook ID, Live editor python workspace code, and user query
+        let userContent = """
+        Curriculum Workbook ID: \(lessonId)
+        My Active Code:
+        ```python
+        \(context)
+        ```
+        
+        My Query: \(text)
+        """
+        messagesArray.append(MessagePayload(role: "user", content: userContent))
+        
         let payload = OllamaPayload(model: selectedModel, messages: messagesArray, stream: true)
         request.httpBody = try? JSONEncoder().encode(payload)
         

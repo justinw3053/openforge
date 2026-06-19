@@ -9,6 +9,10 @@ struct CommsArrayView: View {
     @State private var inputText: String = ""
     @State private var isSendHovered = false
     
+    // Prompt History State
+    @State private var promptHistory: [String] = []
+    @State private var historyIndex: Int = -1
+    
     var body: some View {
         VStack(spacing: 0) {
             // Header: Theme Selector & Model Selector
@@ -42,7 +46,7 @@ struct CommsArrayView: View {
             Divider()
                 .background(Color.primary.opacity(0.05))
             
-            // Message Log - fully transparent to let ContentView's .hudWindow seeps through natively
+            // Message Log
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 14) {
@@ -78,9 +82,11 @@ struct CommsArrayView: View {
             Divider()
                 .background(Color.primary.opacity(0.05))
             
-            // Chat Input Bar
+            // Chat Input Bar (Warp-styled Multi-line and history aware)
             HStack(spacing: 12) {
-                TextField("Ask Carl about the physics...", text: $inputText, onCommit: sendMessage)
+                // Vertical-axis TextField auto-expands from 1 to 5 lines
+                TextField("Ask Carl about the physics...", text: $inputText, axis: .vertical)
+                    .lineLimit(1...5)
                     .textFieldStyle(PlainTextFieldStyle())
                     .padding(10)
                     .background(Color(NSColor.textBackgroundColor).opacity(0.45))
@@ -90,6 +96,25 @@ struct CommsArrayView: View {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
                     )
+                    // Consolidated Single-Modifier Keyboard Listener (Bypasses Compiler Timeouts)
+                    .onKeyPress { press in
+                        if press.key == .return {
+                            if press.modifiers.contains(.shift) {
+                                inputText += "\n"
+                                return .handled
+                            } else {
+                                sendMessage()
+                                return .handled
+                            }
+                        } else if press.key == .upArrow {
+                            handleUpArrow()
+                            return .handled
+                        } else if press.key == .downArrow {
+                            handleDownArrow()
+                            return .handled
+                        }
+                        return .ignored
+                    }
                 
                 Button(action: sendMessage) {
                     Image(systemName: "paperplane.fill")
@@ -126,7 +151,7 @@ struct CommsArrayView: View {
     }
     
     func sendMessage() {
-        let text = inputText.trimmingCharacters(in: .whitespaces)
+        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
         
         // INTERCEPT SLASH COMMANDS: /new, /clear, /reset
@@ -137,6 +162,12 @@ struct CommsArrayView: View {
             }
             return
         }
+        
+        // Save to local prompt history
+        if promptHistory.last != text {
+            promptHistory.append(text)
+        }
+        historyIndex = -1
         
         // Asynchronously clear input on MainActor to avoid text-field binding retention
         DispatchQueue.main.async {
@@ -155,6 +186,28 @@ struct CommsArrayView: View {
             } else if let last = viewModel.messages.last {
                 proxy.scrollTo(last.id, anchor: .bottom)
             }
+        }
+    }
+    
+    // MARK: - Prompt History Navigation Helpers
+    private func handleUpArrow() {
+        guard !promptHistory.isEmpty else { return }
+        if historyIndex == -1 {
+            historyIndex = promptHistory.count - 1
+        } else if historyIndex > 0 {
+            historyIndex -= 1
+        }
+        inputText = promptHistory[historyIndex]
+    }
+    
+    private func handleDownArrow() {
+        guard !promptHistory.isEmpty && historyIndex != -1 else { return }
+        if historyIndex < promptHistory.count - 1 {
+            historyIndex += 1
+            inputText = promptHistory[historyIndex]
+        } else {
+            historyIndex = -1
+            inputText = ""
         }
     }
 }
@@ -176,6 +229,7 @@ struct ChatBubble: View {
                     .padding(.vertical, 8)
                     .padding(.horizontal, 14)
                     .foregroundColor(messageObj.isUser ? .white : activeTheme.textColor)
+                    .textSelection(.enabled) // CRITICAL: Enables native text highlighting and copying from Chat!
                     .background(
                         messageObj.isUser 
                         ? activeTheme.accentColor
