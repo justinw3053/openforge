@@ -36,7 +36,7 @@ struct ForgeEditorView: View {
             // Lower Panel: Code Stage Bento Card & Terminal Console
             VStack(spacing: 0) {
                 VStack(spacing: 12) {
-                    // Bento Code Stage (Dynamic Theme)
+                    // Bento Code Stage (Dynamic Theme & Warp Styled)
                     VStack(alignment: .leading, spacing: 0) {
                         // Header bar
                         HStack {
@@ -110,14 +110,15 @@ struct ForgeEditorView: View {
                         TextEditor(text: $viewModel.activeCode)
                             .font(.system(.body, design: .monospaced))
                             .padding(10)
-                            .background(viewModel.activeTheme == .systemGlass ? .clear : viewModel.activeTheme.textEditorBackground)
+                            .scrollContentBackground(.hidden) // CRITICAL FIX: Hides the default Cocoa text editor solid background!
+                            .background(viewModel.activeTheme == .systemGlass ? Color.clear : viewModel.activeTheme.textEditorBackground)
                     }
                     .background(viewModel.activeTheme == .systemGlass ? AnyView(Color.clear.background(.thinMaterial)) : AnyView(viewModel.activeTheme.contentBackground))
-                    .cornerRadius(12)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(Color.primary.opacity(0.08), lineWidth: 1)
                     )
+                    .clipShape(RoundedRectangle(cornerRadius: 12)) // CRITICAL FIX: Forces perfect rounded corner clipping on the editor stage!
                     .shadow(color: Color.black.opacity(0.02), radius: 6, x: 0, y: 3)
                     
                     // Warp-Style, High-Contrast Translucent Terminal Console (Hard-edges bug fixed via clipShape!)
