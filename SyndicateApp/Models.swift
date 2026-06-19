@@ -172,8 +172,11 @@ class SyllabusViewModel: ObservableObject {
             self.lessons = parsedLessons
             self.isLoading = false
             
-            // Auto-select first lesson if none selected
-            if self.selectedLesson == nil, let first = parsedLessons.first {
+            // Restore last selected lesson from UserDefaults on app launch, or default to first
+            if let lastLessonId = UserDefaults.standard.string(forKey: "lastSelectedLessonId"),
+               let matchedLesson = parsedLessons.first(where: { $0.id == lastLessonId }) {
+                self.selectLesson(matchedLesson)
+            } else if self.selectedLesson == nil, let first = parsedLessons.first {
                 self.selectLesson(first)
             }
         } catch {
@@ -189,6 +192,10 @@ class SyllabusViewModel: ObservableObject {
         self.activeCode = ""
         self.lastWrittenHash = ""
         self.selectedExerciseIndex = 0 // Reset to first exercise on workbook switch
+        
+        // Save selected lesson ID persistently across app restarts
+        UserDefaults.standard.set(lesson.id, forKey: "lastSelectedLessonId")
+        
         self.saveTask?.cancel() // CRITICAL FIX: Kill any pending auto-saves from the previous lesson
         self.saveTask = nil
         self.fileWatcher.stopWatching()
