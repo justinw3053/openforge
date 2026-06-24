@@ -605,7 +605,21 @@ class ChatViewModel: ObservableObject {
         let memoryPath = "\(workspacePath)/.pi/memory.txt"
         return await withCheckedContinuation { continuation in
             DispatchQueue.global(qos: .background).async {
-                let content = (try? String(contentsOfFile: memoryPath, encoding: .utf8)) ?? ""
+                var content = (try? String(contentsOfFile: memoryPath, encoding: .utf8)) ?? ""
+                
+                // Dynamically personalize the student profile if empty or still set to the default developer profile
+                if content.isEmpty || content.contains("STUDENT NAME: Justin") {
+                    let actualName = NSFullUserName().isEmpty ? "Developer" : NSFullUserName()
+                    content = """
+STUDENT NAME: \(actualName)
+COMPLETED WORKBOOKS: []
+CURRENT WORKBOOK: None
+NOTES:
+- Guide this student Socratically using analogies and targeted questions.
+"""
+                    try? content.write(toFile: memoryPath, atomically: true, encoding: .utf8)
+                }
+                
                 continuation.resume(returning: content)
             }
         }

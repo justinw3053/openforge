@@ -1,15 +1,29 @@
-# EXERCISE 12: Safe Dictionary Lookups (.get)
+# BOSS FIGHT: Clean Log Pipeline (Simplified)
 #
-# If we look up a key that doesn't exist using brackets, the app crashes!
-# To prevent this, we use the `.get()` method, providing a fallback default value:
-#    val = config.get("missing_key", "default_value")
+# Welcome to your first Boss Fight!
+# You are going to build a simple, bulletproof parser to clean a raw string log.
 #
-# Your Task:
-# Safely look up the key "temperature" inside the 'config' dictionary.
-# If "temperature" is missing, return the default value 0.7.
+# Input list format: ["justin:active", "carl:pending", "malformed_row"]
+# Output expected: [{"username": "justin", "status": "active"}, ...]
+#
+# Tip:
+# 1. Loop over 'raw_logs' using 'for line in raw_logs:'
+# 2. Check if the line is valid: if ":" in line:
+# 3. Split the line into name and status: parts = line.split(":")
+# 4. Extract username and status from parts and append as a dictionary!
 
-def get_temperature(config):
-    # Complete the line below using the .get("temperature", 0.7) method on config!
-    temperature = ...
-    
-    return temperature
+def clean_log_pipeline(raw_logs):
+    cleaned_data = []
+    # Complete the loops and conditions below using active placeholders!
+    for line in ...:
+        if ... in line:
+            parts = ...
+            if len(parts) == 2:
+                username = ...
+                status = ...
+                
+                # Construct dictionary and append
+                record = {"username": ..., "status": ...}
+                cleaned_data.append(...)
+                
+    return cleaned_data
