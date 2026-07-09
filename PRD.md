@@ -6,7 +6,7 @@ Transform the Syndicate 3.0 Python curriculum from flat Jupyter Notebooks into a
 ---
 
 ## 2. Terminology & Branding Update
-*   **The Socratic Tutor:** Named **Carl** (formerly Sebastian).
+*   **The folksy partner-buddy mentor:** Named **Carl** (formerly Sebastian).
 *   **Aesthetic & UX:** "The Forge" — premium, dark-themed, translucent macOS native style (San Francisco typography, SF Symbols, standard sidebar-detail-inspector panels).
 
 ---

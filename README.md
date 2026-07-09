@@ -5,9 +5,9 @@ OpenForge is a premium, standalone, local-first macOS application designed as an
 ---
 
 ## 🧭 The Vision
-Rather than an external, noisy browser chat panel, OpenForge embeds your Socratic mentor—**Carl**—directly inside a highly responsive, custom-tailored macOS desktop workspace. 
+Rather than an external, noisy browser chat panel, OpenForge embeds your folksy mentor and buddy—**Carl**—directly inside a highly responsive, custom-tailored macOS desktop workspace. 
 
-Carl acts as a peer programmer who **never** hands out ready solution code. Instead, he guides you Socratically by analyzing your tracebacks, raising core algorithmic questions, suggesting conceptual "naive attempts", and tracking your recurring struggles and milestones inside a persistent local memory ledger.
+Carl acts as a peer programmer who guides you step-by-step using plain-spoken physical analogies, clear blueprints, and folksy Southern encouragement. He keeps his foot down on writing code yourself, unless you explicitly trigger the "drop the rules" bypass command to have him swing the hammer directly.
 
 ---
 

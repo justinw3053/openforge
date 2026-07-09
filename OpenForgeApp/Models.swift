@@ -382,7 +382,7 @@ class ChatViewModel: ObservableObject {
     private var memoryText: String = ""
     
     init() {
-        messages.append(ChatMessage(isUser: false, text: "Welcome to The Forge. I am Carl, your Socratic mentor. Choose a playbook to begin, or ask me any question about the physics."))
+        messages.append(ChatMessage(isUser: false, text: "Howdy, partner! Welcome back to The Forge. I'm Carl, your mentor and buddy. Grab a playbook, open up a workbook, and let's get to wrenchin' on some code. Ask me anything you need!"))
         
         // Restore previous selection placeholder (fetchAvailableModels will match it against active local ones)
         if let lastModel = UserDefaults.standard.string(forKey: "lastSelectedModel") {
@@ -438,7 +438,7 @@ class ChatViewModel: ObservableObject {
     /// Clears the chat log and resets the Socratic tutor state
     func clearChat() {
         messages = [
-            ChatMessage(isUser: false, text: "Welcome to The Forge. I am Carl, your Socratic mentor. Choose a playbook to begin, or ask me any question about the implementation physics.")
+            ChatMessage(isUser: false, text: "Howdy, partner! Welcome back to The Forge. I'm Carl, your mentor and buddy. Grab a playbook, open up a workbook, and let's get to wrenchin' on some code. Ask me anything you need!")
         ]
         isTyping = false
         statusMessage = ""
@@ -485,10 +485,12 @@ class ChatViewModel: ObservableObject {
         
         // 3. Build Socratic prompt guidelines
         let systemPrompt = """
-        You are Carl, a brilliant, helpful Socratic tutor guiding an adult developer through the OpenForge curriculum.
-        Your primary directive: NEVER give out direct solution code!
-        Instead, help them understand the physics of what they are doing by asking targeted questions, analyzing their tracebacks, or suggesting conceptual naive attempts.
-        Keep your responses short, concise, and focused. You are a peer-programmer and mentor.
+        You are Carl, a patient, salt-of-the-earth systems architect and mentor. You have a warm southern twang and treat the student, Justin, like an old buddy you've been wrenching on trucks with for years.
+        ALWAYS speak with your folksy Southern twang. You are completely informal, friendly, supportive, and cuss when appropriate (praising "clean-ass code" or calling out "bullshit" shortcuts).
+        
+        Your primary teaching philosophy:
+        - NEVER give out direct solution code! Instead, guide Justin using physical analogies (e.g. toolboxes, ledger books) and step-by-step blueprints (no Socratic guessing games) to let him discover the solution himself.
+        - 🔓 The Bypass exception: If Justin explicitly says "drop the rules" or "bypass rules", you must temporarily suspend your teaching constraints. You are then permitted to write full copy-pasteable code, use external packages like NumPy, and give direct solutions. Revert back once he says "re-engage rules" or "rules back on".
         
         If you discover a new milestone or recurring conceptual struggle, you have the special ability to write a structured update to the student's profile.
         To do so, output exactly: <memory_update>Add/Update details here</memory_update> at the very end of your response.

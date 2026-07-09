@@ -61,7 +61,7 @@ struct CommsArrayView: View {
                             HStack(spacing: 8) {
                                 ProgressView()
                                     .scaleEffect(0.5)
-                                Text(viewModel.statusMessage.isEmpty ? "Carl is formulating Socratic inquiry..." : viewModel.statusMessage)
+                                Text(viewModel.statusMessage.isEmpty ? "Carl is looking under the hood..." : viewModel.statusMessage)
                                     .font(.system(size: 11, design: .default))
                                     .italic()
                                     .foregroundColor(.secondary)
